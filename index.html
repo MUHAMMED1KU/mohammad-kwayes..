@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>🌙 تحدي القرآن العائلي</title>
+
+<style>
+body{
+  direction: rtl;
+  font-family: Tahoma;
+  background: linear-gradient(#0f2027,#203a43,#2c5364);
+  color:white;
+  text-align:center;
+}
+.box{
+  background:white;
+  color:black;
+  padding:20px;
+  margin:15px auto;
+  max-width:420px;
+  border-radius:12px;
+  box-shadow:0 0 10px #000;
+}
+button{
+  padding:10px 15px;
+  margin:5px;
+  border:none;
+  border-radius:8px;
+  background:#27ae60;
+  color:white;
+  cursor:pointer;
+}
+.progress{
+  background:#ddd;
+  border-radius:20px;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+.progress-bar{
+  height:20px;
+  background:#27ae60;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🌙 تحدي القرآن الرمضاني</h1>
+<p>🤍 لا تنسَ الدعاء لوالديك</p>
+
+<div class="box">
+  <input id="name" placeholder="اسمك"><br><br>
+  <input id="pass" type="password" placeholder="كلمة السر"><br><br>
+  <button onclick="login()">دخول</button>
+</div>
+
+<div id="panel" class="box" style="display:none">
+  <h2 id="welcome"></h2>
+
+  <h3>📖 القرآن الكريم</h3>
+  الصفحات المقروءة: <b><span id="pages">0</span></b><br>
+  الأجزاء المكتملة: <b><span id="juz">0</span></b><br>
+  الحسنات التقريبية: <b><span id="hasanat">0</span></b><br><br>
+
+  <button onclick="addPages(1)">+ صفحة</button>
+  <button onclick="addPages(5)">+ 5 صفحات</button>
+  <button onclick="addPages(10)">+ 10 صفحات</button>
+
+  <p id="message" style="margin-top:10px;color:green"></p>
+  <p>✨ والله يضاعف لمن يشاء ✨</p>
+</div>
+
+<div class="box">
+  <h3>🏁 التحدي العائلي (القرآن)</h3>
+  <div id="challenge"></div>
+</div>
+
+<script>
+let user="";
+
+function login(){
+  const n=name.value;
+  const p=pass.value;
+  if(!n||!p) return alert("أدخل الاسم وكلمة السر");
+
+  user=n;
+
+  if(!localStorage[n]){
+    localStorage[n]=JSON.stringify({
+      pass:p,
+      pages:0,
+      juz:0
+    });
+  }
+
+  const data=JSON.parse(localStorage[n]);
+  if(data.pass!==p) return alert("كلمة السر خطأ");
+
+  panel.style.display="block";
+  welcome.innerText="أهلًا "+n;
+  updateUI();
+  loadChallenge();
+}
+
+function addPages(num){
+  const data=JSON.parse(localStorage[user]);
+  const oldJuz=data.juz;
+
+  data.pages+=num;
+  data.juz=Math.floor(data.pages/20);
+  localStorage[user]=JSON.stringify(data);
+
+  if(data.juz>oldJuz){
+    message.innerText="🎉 مبارك! أتممت جزءًا كاملًا، جعله الله في ميزان حسناتك";
+  }else{
+    message.innerText="🌸 تقبّل الله تلاوتك ونوّر بها قلبك";
+  }
+
+  updateUI();
+  loadChallenge();
+}
+
+function updateUI(){
+  const data=JSON.parse(localStorage[user]);
+  pages.innerText=data.pages;
+  juz.innerText=data.juz;
+  hasanat.innerText=data.pages*100; // تقديري
+}
+
+function loadChallenge(){
+  let html="";
+  for(let k in localStorage){
+    try{
+      const d=JSON.parse(localStorage[k]);
+      if(d.pages!==undefined){
+        const percent=Math.min(d.pages/604*100,100);
+        html+=`
+          <p>${k}</p>
+          <div class="progress">
+            <div class="progress-bar" style="width:${percent}%"></div>
+          </div>
+        `;
+      }
+    }catch{}
+  }
+  challenge.innerHTML=html;
+}
+</script>
+
+</body>
+</html>
